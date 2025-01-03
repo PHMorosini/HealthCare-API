@@ -10,7 +10,7 @@ public class ClienteDTO
         public SexoEnum SexoCliente { get; set; }
         public DateTime DataCriacao { get; set; }
         public DateTime DataAtualizacao { get; set; }
-        public List<global::ProblemaSaude> ProblemasDeSaude { get; set; }
+        public List<ProblemaSaude.Entity.ProblemaSaude> ProblemasDeSaude { get; set; }
         public decimal Altura { get; set; }
         public decimal Peso { get; set; }
 

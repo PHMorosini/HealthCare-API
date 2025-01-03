@@ -1,7 +1,8 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using HealthCare_API.Content.Cliente.Entity;
 using HealthCare_API.Content.ProblemaSaude.ValueObject;
+
+namespace HealthCare_API.Content.ProblemaSaude.Entity;
 
 public class ProblemaSaude
 {
@@ -12,5 +13,5 @@ public class ProblemaSaude
     public string Nome { get; set; }
     [Required(ErrorMessage = "O grau do problema é obrigatorio")]
     public GrauEnum Grau { get; set; }
-    public List<Cliente> Clientes { get; set; } = new();
+    public List<Cliente.Entity.Cliente> Clientes { get; set; } = new();
 }
