@@ -9,10 +9,10 @@ public interface IClienteService
     ClienteDTO GetClienteById(int id);
     IEnumerable<ClienteDTO> GetAllClientes();
     public void AddCliente(ClienteCreateDTO clientedto);
-    public void UpdateCliente(int id, ClienteDTO clienteDto);
+    public void UpdateCliente(int id, ClienteCreateDTO clienteDto);
     public void DeleteCliente(int id);
     decimal GetClienteProblemaScore(int id);
-    IEnumerable<ClienteDTO> GetAllClienteByProblema(GrauEnum grau);
+    IEnumerable<ClienteDTO> GetAllClienteByGrauProblema(GrauEnum grau);
 
     List<ClienteScore> GetTop10ClientesMaisRisco();
 }

@@ -3,6 +3,8 @@ using AutoMapper;
 using HealthCare_API.Content.Cliente.DTO;
 using HealthCare_API.Content.Cliente.Entity;
 using HealthCare_API.Content.Cliente.Interfaces;
+using HealthCare_API.Content.ProblemaSaude.DTO;
+using HealthCare_API.Content.ProblemaSaude.Interfaces;
 using HealthCare_API.Content.ProblemaSaude.ValueObject;
 
 namespace HealthCare_API.Content.Cliente.Services;
@@ -10,17 +12,24 @@ namespace HealthCare_API.Content.Cliente.Services;
 public class ClienteService : IClienteService
 {
     private readonly IClienteRepository _repository;
+    private readonly IProblemaSaudeRepository _problemaSaudeRepository;
     private readonly IMapper _mapper;
 
-    public ClienteService(IClienteRepository repository,IMapper mapper)
+    public ClienteService(IClienteRepository repository,IMapper mapper, IProblemaSaudeRepository problemaSaudeRepository)
     {
         _repository = repository;
         _mapper = mapper;
+        _problemaSaudeRepository = problemaSaudeRepository;
     }
 
     public void AddCliente(ClienteCreateDTO clientedto)
     {
         var cliente = _mapper.Map<Entity.Cliente>(clientedto);
+        cliente.ProblemasDeSaude = clientedto.ProblemasDeSaudeIds
+        .Select(id => _problemaSaudeRepository.GetProblemaByID(id))
+        .Where(problema => problema != null)
+        .ToList();
+
         _repository.AddCliente(cliente);
     }
 
@@ -29,21 +38,26 @@ public class ClienteService : IClienteService
         _repository.DeleteCliente(id);
     }
 
-    public IEnumerable<ClienteDTO> GetAllClienteByProblema(GrauEnum grau)
+    public IEnumerable<ClienteDTO> GetAllClienteByGrauProblema(GrauEnum grau)
     {
         IEnumerable<Entity.Cliente> clientes = _repository.GetAllClienteByProblema(grau);
         IEnumerable<ClienteDTO> clientesDTO = clientes.Select(cliente => new ClienteDTO
         {
             Id = cliente.Id,
             Nome = cliente.Nome,
-            Nascimento =  cliente.Nascimento,
+            Nascimento = cliente.Nascimento,
             DataCriacao = cliente.DataCriacao,
             DataAtualizacao = cliente.DataAtualizacao,
             Peso = cliente.Peso,
             SexoCliente = cliente.SexoCliente,
-            ProblemasDeSaude = cliente.ProblemasDeSaude,
-            Altura = cliente.Altura
-        });
+            Altura = cliente.Altura,
+            ProblemasDeSaude = cliente.ProblemasDeSaude?.Select(problema => new ProblemaSaudeDTO
+            {
+                Id = problema.Id,
+                Nome = problema.Nome,
+                Grau = problema.Grau
+            }).ToList()
+        }).ToList();
 
         return clientesDTO;
     }
@@ -60,9 +74,14 @@ public class ClienteService : IClienteService
             DataAtualizacao = cliente.DataAtualizacao,
             Peso = cliente.Peso,
             SexoCliente = cliente.SexoCliente,
-            ProblemasDeSaude = cliente.ProblemasDeSaude,
-            Altura = cliente.Altura
-        });
+            Altura = cliente.Altura,          
+            ProblemasDeSaude = cliente.ProblemasDeSaude?.Select(problema => new ProblemaSaudeDTO
+            {
+                Id = problema.Id,
+                Nome = problema.Nome,
+                Grau = problema.Grau 
+            }).ToList() 
+        }).ToList(); 
         return clientesDTO;
     }
 
@@ -125,19 +144,36 @@ public class ClienteService : IClienteService
 
     }
 
-    public void UpdateCliente(int id, ClienteDTO clienteDto)
+    public void UpdateCliente(int id, ClienteCreateDTO clienteDto)
     {
         var cliente = _repository.GetClienteById(id);
+
         cliente.Nome = clienteDto.Nome;
-        cliente.ProblemasDeSaude = clienteDto.ProblemasDeSaude;
         cliente.Altura = clienteDto.Altura;
         cliente.DataAtualizacao = clienteDto.DataAtualizacao;
         cliente.Nascimento = clienteDto.Nascimento;
         cliente.Peso = clienteDto.Peso;
         cliente.SexoCliente = clienteDto.SexoCliente;
-        cliente.Id = cliente.Id;
+
+        if (clienteDto.ProblemasDeSaudeIds != null && clienteDto.ProblemasDeSaudeIds.Any())
+        {
+            // Usando a mesma lógica do AddCliente
+            cliente.ProblemasDeSaude = clienteDto.ProblemasDeSaudeIds
+                .Select(id => _problemaSaudeRepository.GetProblemaByID(id)) // Busca o problema pelo ID
+                .Where(problema => problema != null) // Filtra problemas nulos
+                .ToList(); // Converte para lista
+        }
+        else
+        {
+            // Se não houver problemas de saúde, você pode limpar a lista ou manter os existentes
+            cliente.ProblemasDeSaude.Clear();
+        }
+
+        // Atualiza o cliente no repositório
         _repository.UpdateCliente(cliente);
+
     }
+
     public int CalcularIdade(DateOnly dataNascimento)
     {
         var hoje = DateTime.Today;

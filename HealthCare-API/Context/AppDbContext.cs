@@ -1,5 +1,6 @@
 ﻿using HealthCare_API.Content.Cliente.Entity;
 using Microsoft.EntityFrameworkCore;
+using ProblemaSaudeEntity = HealthCare_API.Content.ProblemaSaude.Entity.ProblemaSaude;
 
 namespace HealthCare_API.Context
 {
@@ -9,7 +10,7 @@ namespace HealthCare_API.Context
         {
         }
         public DbSet<Content.Cliente.Entity.Cliente> Clientes { get; set; }
-        public DbSet<ProblemaSaude> ProblemasSaude { get; set; }
+        public DbSet<ProblemaSaudeEntity> ProblemasSaude { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -18,7 +19,7 @@ namespace HealthCare_API.Context
                 .WithMany(p => p.Clientes)
                 .UsingEntity<Dictionary<string, object>>(
                     "ClienteProblemaSaude",
-                    j => j.HasOne<ProblemaSaude>().WithMany().HasForeignKey("ProblemaSaudeId"),
+                    j => j.HasOne<ProblemaSaudeEntity>().WithMany().HasForeignKey("ProblemaSaudeId"),
                     j => j.HasOne<Cliente>().WithMany().HasForeignKey("ClienteId")
                 );
         }

@@ -28,10 +28,25 @@ public class ProblemaSaudeRepository : IProblemaSaudeRepository
 
     public void EditProblema(Entity.ProblemaSaude problema)
     {
-        _context.Update(problema);
-        _context.SaveChanges();
+        var problemasaude = _context.ProblemasSaude.Find(problema.Id);
+        if (problemasaude != null)
+        {
+            problemasaude.Nome = problema.Nome;
+            problemasaude.Grau = problema.Grau;
+
+            _context.SaveChanges();
+        }
+        else
+        {
+            throw new Exception("Problema de saúde não encontrado.");
+        }
 
     }
+    public IEnumerable<Entity.ProblemaSaude> GetProblemasDeSaudeByIds(List<int> ids)
+    {
+        return _context.ProblemasSaude. Where(p => ids.Contains(p.Id)).ToList();
+    }
+
 
     public IEnumerable<Entity.ProblemaSaude> GetListProblemaSaude()
     {

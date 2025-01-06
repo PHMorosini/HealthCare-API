@@ -8,7 +8,8 @@ public class ClienteProfile : Profile
 {
     public ClienteProfile()
     {
-        CreateMap<ClienteDTO, Cliente>();
+        CreateMap<ClienteDTO, Cliente>()
+            .ForMember(dest => dest.ProblemasDeSaude, opt => opt.MapFrom(src => src.ProblemasDeSaude)); 
         CreateMap<Cliente, ClienteDTO>();
         CreateMap<ClienteCreateDTO, Cliente>();
     }

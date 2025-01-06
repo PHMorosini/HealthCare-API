@@ -25,7 +25,8 @@ public class ClienteRepository : IClienteRepository
 
     public IEnumerable<Entity.Cliente> GetAllClientes()
     {
-        var Listclientes = _context.Clientes.ToList();
+        var Listclientes = _context.Clientes
+                .Include(c => c.ProblemasDeSaude).ToList();
          IEnumerable<Entity.Cliente> Clientes = Listclientes;
          return Clientes;
     }
