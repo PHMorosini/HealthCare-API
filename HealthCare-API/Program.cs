@@ -8,6 +8,7 @@ using HealthCare_API.Content.ProblemaSaude.Services;
 using HealthCare_API.Context;
 using HealthCare_API.Mappers;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace HealthCare_API;
 
@@ -20,16 +21,25 @@ public class Program
         // Add services to the container.
         builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
         builder.Services.AddScoped<IProblemaSaudeRepository, ProblemaSaudeRepository>();
+
         builder.Services.AddScoped<IClienteService, ClienteService>();
         builder.Services.AddScoped<IProblemaSaudeService, ProblemaSaudeService>();
 
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(options =>
+        {
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+            // Inclui a documentação XML no Swagger
+            options.IncludeXmlComments(xmlPath);
+        });
 
         //Mappers
         builder.Services.AddAutoMapper(typeof(ClienteProfile).Assembly);
+        builder.Services.AddAutoMapper(typeof(ProblemaSaudeProfile).Assembly);
 
         //context ou AppDbContext,tnt faz
         builder.Services.AddDbContext<AppDbContext>(options =>

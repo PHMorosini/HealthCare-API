@@ -17,6 +17,7 @@ namespace HealthCare_API.Controllers.Cliente
             _clienteService = clienteservice;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
