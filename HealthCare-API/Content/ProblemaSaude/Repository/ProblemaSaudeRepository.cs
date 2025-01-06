@@ -42,6 +42,11 @@ public class ProblemaSaudeRepository : IProblemaSaudeRepository
         }
 
     }
+    public IEnumerable<Entity.ProblemaSaude> GetProblemasDeSaudeByIds(List<int> ids)
+    {
+        return _context.ProblemasSaude. Where(p => ids.Contains(p.Id)).ToList();
+    }
+
 
     public IEnumerable<Entity.ProblemaSaude> GetListProblemaSaude()
     {
